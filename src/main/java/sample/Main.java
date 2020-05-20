@@ -2,15 +2,11 @@ package sample;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -18,19 +14,28 @@ import javafx.stage.StageStyle;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
+  private final double DEFAULT_SCENE_HEIGHT = 150;
   private final double SCENE_WIDTH = 340;
+
   private final double STAGE_LOCATION_X = Screen.getPrimary().getBounds().getWidth() - SCENE_WIDTH;
   private final double STAGE_LOCATION_Y = 0;
 
+  private final double LAYOUT_SPACING = 15;
+  private final double LAYOUT_PADDING = 10;
+
   private final String STAGE_TITLE = "Word of the Day";
+
+  public static void main(String[] args) {
+    launch();
+  }
 
   @Override
   public void start(Stage stage) {
 
-    Scene scene = new Scene(getHolder(getData()), SCENE_WIDTH, 120);
+    Map<TagEntity, String> wordOfTheDayData = getData();
+    Scene scene = new Scene(getHolder(wordOfTheDayData), SCENE_WIDTH, calculateSceneHeight(wordOfTheDayData));
 
     stage.initStyle(StageStyle.UNDECORATED);
     stage.setX(STAGE_LOCATION_X);
@@ -43,10 +48,11 @@ public class Main extends Application {
   private VBox getHolder(Map<TagEntity, String> map) {
 
     Label word = new Label(map.get(TagEntity.Word).toUpperCase());
-    word.setFont(CustomFont.ARIAL);
+    word.setFont(CustomFont.BASKERVILLE);
 
     Label description = new Label(map.get(TagEntity.Description));
     description.setFont(CustomFont.SERIF);
+    description.setWrapText(true);
 
     Label moreInfoLabel = new Label("More info: ");
 
@@ -56,17 +62,18 @@ public class Main extends Application {
     hyperlink.setOnAction(t -> getHostServices().showDocument(hyperlink.getText()));
 
     HBox hBox = new HBox(moreInfoLabel, hyperlink);
-    VBox holder = new VBox(word, description, hBox);
-    holder.setSpacing(15);
-    holder.setPadding(new Insets(0, 10, 10, 10));
-    holder.setAlignment(Pos.BASELINE_LEFT);
-    holder.setStyle("-fx-background-color: c2e0e3;");
+    VBox layout = new VBox(word, description, hBox);
+    layout.setSpacing(LAYOUT_SPACING);
+    layout.setPadding(new Insets(LAYOUT_PADDING));
+    layout.setStyle("-fx-background-color: c2e0e3;");
 
-    return holder;
+    return layout;
   }
 
-  public static void main(String[] args) {
-    launch();
+  private double calculateSceneHeight(Map<TagEntity, String> wordOfTheDayData) {
+    double oneRowHeight = Util.getStringHeight(wordOfTheDayData.get(TagEntity.Description), CustomFont.SERIF);
+    int numberOfRows = (int)(Util.getStringWidth(wordOfTheDayData.get(TagEntity.Description), CustomFont.SERIF) / (SCENE_WIDTH - LAYOUT_PADDING * 2));
+    return DEFAULT_SCENE_HEIGHT + ((numberOfRows - 1) * oneRowHeight);
   }
 
   private Map<TagEntity, String> getData() {

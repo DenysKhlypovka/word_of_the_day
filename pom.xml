@@ -8,7 +8,6 @@
     <artifactId>word_of_the_day</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
     <dependencies>
 
         <dependency>
