@@ -19,4 +19,10 @@ public class HtmlElementMethod {
       return data.html();
     }
   }
+
+  public static class GetHtmlExtractDataFromChildren implements TreeElementAction {
+    public String execute(Element data) {
+      return data.html().replaceAll("<[^>]*>", "");
+    }
+  }
 }
